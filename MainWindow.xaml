@@ -1,0 +1,86 @@
+﻿<Window x:Class="TimeTracker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:TimeTracker"
+        Title="Time Tracker" Height="750" Width="750" Closing="Window_Closing" Icon="app.ico">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+            <TextBlock Margin="5,5,0,5" Text="Start Date:" VerticalAlignment="Center"/>
+            <Button Margin="5" Padding="3" Content="{Binding StartTime}" ContentStringFormat="d" Click="Button_StartDate_Click"/>
+            <TextBlock Margin="5,5,0,5" Text="End Date:" VerticalAlignment="Center"/>
+            <Button Margin="5" Padding="3" Content="{Binding EndTime}" ContentStringFormat="d" Click="Button_EndDate_Click"/>
+            <Button Margin="5" Padding="3" Content="Select Range" Click="Button_DateRange_Click"/>
+            <CheckBox Margin="5" Content="Show Overnight Away" IsChecked="{Binding SelectedActivity.IsShowingOvernightAway}" VerticalAlignment="Center"/>
+        </StackPanel>
+        <ScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="timelineViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+            <ItemsControl ItemsSource="{Binding SelectedActivity.ActivityRegions}">
+                <ItemsControl.LayoutTransform>
+                    <TransformGroup>
+                        <ScaleTransform x:Name="scaleTransform"/>
+                    </TransformGroup>
+                </ItemsControl.LayoutTransform>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Rectangle Width="{Binding DurationPixelWidth}" Height="30">
+                            <Rectangle.Fill>
+                                <SolidColorBrush Color="{Binding Color}"/>
+                            </Rectangle.Fill>
+                            <Rectangle.ToolTip>
+                                <TextBlock>
+                                    <Run Text="{Binding Activity, Mode=OneWay}"/>
+                                    <LineBreak/>
+                                    <Run Text="Start Time: "/>
+                                    <Run Text="{Binding StartTime, Mode=OneWay}"/>
+                                    <LineBreak/>
+                                    <Run Text="End Time: "/>
+                                    <Run Text="{Binding EndTime, Mode=OneWay}"/>
+                                    <LineBreak/>
+                                    <Run Text="Duration: "/>
+                                    <Run Text="{Binding Duration, Mode=OneWay}"/>
+                                </TextBlock>
+                            </Rectangle.ToolTip>
+                        </Rectangle>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <GroupBox Grid.Row="2" Grid.Column="0" Header="Current State">
+            <ItemsControl ItemsSource="{Binding ActivityTracker.Watchers.Values}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="5" Orientation="Horizontal">
+                            <CheckBox Content="{Binding DisplayName}" IsChecked="{Binding Active}" IsEnabled="False"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </GroupBox>
+        <GroupBox Grid.Row="2" Grid.Column="1" Header="Summary">
+            <DataGrid ItemsSource="{Binding SelectedActivity.ActivitySummaries}" IsReadOnly="True" Background="White" BorderBrush="Transparent" HeadersVisibility="Column" HorizontalAlignment="Left" AutoGeneratingColumn="DataGrid_AutoGeneratingColumn">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header=" ">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ContentPresenter Content="{Binding Color}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+    </Grid>
+</Window>
