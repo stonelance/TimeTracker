@@ -18,13 +18,21 @@ namespace TimeTracker.Watchers
 
         public State CurrentState;
 
+        public override bool IsActive
+        {
+            get
+            {
+                return this.CurrentState == State.Active;
+            }
+        }
+
         public ProcessFocusWatcher(string displayName, ActivityId activity, string processName)
             : base(displayName, activity)
         {
             this.processName = processName;
         }
 
-		public void OnForegroundProcessNameChanged(string foregroundProcessName)
+		public override void OnForegroundProcessNameChanged(string foregroundProcessName)
 		{
 			State newState = State.Inactive;
 

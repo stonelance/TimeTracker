@@ -31,15 +31,15 @@ namespace TimeTracker
 
         public string Activity
         {
-            get { return ActivityManager.GetNameFromActivity(this.ActivityId); }
-            set { this.ActivityId = ActivityManager.GetActivityFromName(value); }
+            get { return ActivityManager.Instance.GetNameFromActivity(this.ActivityId); }
+            set { this.ActivityId = ActivityManager.Instance.GetActivityFromName(value); }
         }
 
         public Color Color
         {
             get
             {
-                return ActivityManager.GetColorFromActivity(this.ActivityId);
+                return ActivityManager.Instance.GetColorFromActivity(this.ActivityId);
             }
         }
 

@@ -25,6 +25,14 @@ namespace TimeTracker.Watchers
 
         public State CurrentState;
 
+        public override bool IsActive
+        {
+            get
+            {
+                return this.CurrentState == State.Active;
+            }
+        }
+
         public InputWatcher(string displayName, ActivityId activity, float timeToIdleInSeconds, int updatePeriodInMilliseconds)
             : base(displayName, activity)
         {

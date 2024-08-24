@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -41,7 +42,7 @@ namespace TimeTracker
             this.EndTime = now;
             this.lastUpdateTime = now;
             this.ActivityRegions = new ObservableCollection<ActivityRegion>();
-            this.ActivitySummaries = ActivityManager.ActivityIds.ToDictionary(x => x, x => new TimeSpan());
+            this.ActivitySummaries = ActivityManager.Instance.ActivityIds.ToDictionary(x => x, x => new TimeSpan());
         }
 
         public DailyActivity(DateTime now)
@@ -50,7 +51,7 @@ namespace TimeTracker
             this.EndTime = now;
             this.lastUpdateTime = now;
             this.ActivityRegions = new ObservableCollection<ActivityRegion>();
-            this.ActivitySummaries = ActivityManager.ActivityIds.ToDictionary(x => x, x => new TimeSpan());
+            this.ActivitySummaries = ActivityManager.Instance.ActivityIds.ToDictionary(x => x, x => new TimeSpan());
         }
 
         public void Serialize(string path)
@@ -114,6 +115,22 @@ namespace TimeTracker
                         {
                             this.ActivityRegions.Add(this.CurrentActivityRegion);
                         });
+
+
+                    // TODO: Perform plugin actions\fire OnActivityChanged event?
+                    /*
+                    {
+                        var activityColor = ActivityManager.Instance.GetColorFromActivity(activity);
+
+                        ProcessStartInfo psi = new ProcessStartInfo();
+                        psi.FileName = "C:\\Users\\stone\\AppData\\Local\\Microsoft\\WindowsApps\\pythonw.exe";
+                        psi.Arguments = $"\"D:\\Projects\\Twinkly\\twinkly_square.py\" {activityColor.R} {activityColor.G} {activityColor.B}";
+                        psi.UseShellExecute = true;
+                        using (Process process = Process.Start(psi))
+                        {
+                        }
+                    }
+                    */
                 }
 
                 this.lastUpdateTime = now;

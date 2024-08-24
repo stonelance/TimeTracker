@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading;
 
 namespace TimeTracker.Watchers
@@ -29,5 +31,9 @@ namespace TimeTracker.Watchers
         {
             this.cancellationTokenSource.Cancel();
         }
+
+        public virtual bool IsActive { get { return false; } }
+
+        public virtual void OnForegroundProcessNameChanged(string foregroundProcessName) { }
     }
 }

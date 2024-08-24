@@ -12,6 +12,14 @@ namespace TimeTracker.Watchers
 
         public State CurrentState;
 
+        public override bool IsActive
+        {
+            get
+            {
+                return this.CurrentState == State.Active;
+            }
+        }
+
         public LockScreenWatcher(string displayName, ActivityId activity)
             : base(displayName, activity)
         {

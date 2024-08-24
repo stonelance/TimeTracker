@@ -31,6 +31,14 @@ namespace TimeTracker.Watchers
         public event EventHandler ProcessInactive;
         public event EventHandler ProcessStopped;
 
+        public override bool IsActive
+        {
+            get
+            {
+                return this.CurrentState == State.Running;
+            }
+        }
+
         public ProcessActivityWatcher(string displayName, ActivityId activity, string processName, double cpuUsageThresholdForRunning, double delayBeforeReturnToInactiveInSeconds, double updatePeriodInSeconds)
             : base(displayName, activity)
         {

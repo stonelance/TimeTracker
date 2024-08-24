@@ -1,7 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeTracker", "TimeTracker.csproj", "{A9C5D7CC-B98D-4A30-A07D-9EFE2062CCD1}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35201.131
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{D1B1DB4E-EEB0-47F4-A751-B6F69B1A3ABC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwinklyPlugin", "Plugins\TwinklyPlugin\TwinklyPlugin.csproj", "{C1827E73-4683-4155-93AD-1ABC2C55D751}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeTrackerCore", "Core\TimeTrackerCore.csproj", "{1987877E-17FB-43F2-AF49-F0C3EB9633C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeTracker", "App\TimeTracker.csproj", "{A9C5D7CC-B98D-4A30-A07D-9EFE2062CCD1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFocusWatcher", "Plugins\GameFocusWatcher\GameFocusWatcher.csproj", "{E5ADFC1D-A52B-4F01-AC6B-A6191FE33116}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,12 +19,31 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C1827E73-4683-4155-93AD-1ABC2C55D751}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1827E73-4683-4155-93AD-1ABC2C55D751}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1827E73-4683-4155-93AD-1ABC2C55D751}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1827E73-4683-4155-93AD-1ABC2C55D751}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1987877E-17FB-43F2-AF49-F0C3EB9633C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1987877E-17FB-43F2-AF49-F0C3EB9633C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1987877E-17FB-43F2-AF49-F0C3EB9633C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1987877E-17FB-43F2-AF49-F0C3EB9633C6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A9C5D7CC-B98D-4A30-A07D-9EFE2062CCD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A9C5D7CC-B98D-4A30-A07D-9EFE2062CCD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A9C5D7CC-B98D-4A30-A07D-9EFE2062CCD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A9C5D7CC-B98D-4A30-A07D-9EFE2062CCD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5ADFC1D-A52B-4F01-AC6B-A6191FE33116}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5ADFC1D-A52B-4F01-AC6B-A6191FE33116}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5ADFC1D-A52B-4F01-AC6B-A6191FE33116}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5ADFC1D-A52B-4F01-AC6B-A6191FE33116}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C1827E73-4683-4155-93AD-1ABC2C55D751} = {D1B1DB4E-EEB0-47F4-A751-B6F69B1A3ABC}
+		{E5ADFC1D-A52B-4F01-AC6B-A6191FE33116} = {D1B1DB4E-EEB0-47F4-A751-B6F69B1A3ABC}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5DB51AA0-74A8-4D7F-B2AE-F6C0B501086B}
 	EndGlobalSection
 EndGlobal

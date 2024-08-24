@@ -39,7 +39,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -60,10 +60,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Activity.cs" />
     <Compile Include="ActivityRegion.cs" />
     <Compile Include="ActivityTracker.cs" />
-    <Compile Include="Configuration.cs" />
     <Compile Include="DailyActivity.cs" />
     <Compile Include="DailyActivityAggregate.cs" />
     <Compile Include="DateRangeWindow.xaml.cs">
@@ -75,7 +73,6 @@
     <Compile Include="Watchers\ProcessActivityWatcher.cs" />
     <Compile Include="ViewModel\ActivityVM.cs" />
     <Compile Include="ViewModel\WatcherVM.cs" />
-    <Compile Include="Watchers\BaseWatcher.cs" />
     <Compile Include="Watchers\ProcessFocusWatcher.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -128,6 +125,23 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="app.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\TimeTrackerCore.csproj">
+      <Project>{1987877e-17fb-43f2-af49-f0c3eb9633c6}</Project>
+      <Name>TimeTrackerCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Plugins\GameFocusWatcher\GameFocusWatcher.csproj">
+      <Project>{e5adfc1d-a52b-4f01-ac6b-a6191fe33116}</Project>
+      <Name>GameFocusWatcher</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Plugins\TwinklyPlugin\TwinklyPlugin.csproj">
+      <Project>{c1827e73-4683-4155-93ad-1abc2c55d751}</Project>
+      <Name>TwinklyPlugin</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

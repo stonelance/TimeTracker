@@ -9,7 +9,7 @@ namespace TimeTracker.ViewModel
     {
         private ActivityId Activity { get; set; }
 
-        public string Name { get { return ActivityManager.GetNameFromActivity(this.Activity); } }
+        public string Name { get { return ActivityManager.Instance.GetNameFromActivity(this.Activity); } }
 
         public bool Active
         {
@@ -25,7 +25,7 @@ namespace TimeTracker.ViewModel
         {
             get
             {
-                return new Rectangle() { Fill = new SolidColorBrush(ActivityManager.GetColorFromActivity(this.Activity)) };
+                return new Rectangle() { Fill = new SolidColorBrush(ActivityManager.Instance.GetColorFromActivity(this.Activity)) };
             }
         }
 

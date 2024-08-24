@@ -133,12 +133,12 @@ namespace TimeTracker
 			if (!File.Exists(configurationPath))
 			{
 				var defaultConfigurationpath = "defaultConfiguration.json";
-				File.Copy(defaultConfigurationpath, configurationPath);
+				File.Copy(defaultConfigurationpath, configurationPath, true);
 			}
 
 			this.configuration = JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(configurationPath));
 
-			ActivityManager.Initialize(this.configuration);
+			ActivityManager.Instance.Initialize(this.configuration);
 
             InitializeTodaysActivity();
             this.ActivityTracker = new ActivityTracker(this.configuration, this.TodaysActivity);
