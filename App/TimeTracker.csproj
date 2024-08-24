@@ -60,16 +60,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ActivityRegion.cs" />
-    <Compile Include="ActivityTracker.cs" />
-    <Compile Include="DailyActivity.cs" />
-    <Compile Include="DailyActivityAggregate.cs" />
+    <Compile Include="Activity\ActivityRegion.cs" />
+    <Compile Include="Activity\ActivityTracker.cs" />
+    <Compile Include="Activity\DailyActivity.cs" />
+    <Compile Include="Activity\DailyActivityAggregate.cs" />
     <Compile Include="DateRangeWindow.xaml.cs">
       <DependentUpon>DateRangeWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\DailyActivityVM.cs" />
     <Compile Include="Watchers\LockScreenWatcher.cs" />
-    <Compile Include="NativeMethods.cs" />
+    <Compile Include="Utilities\NativeMethods.cs" />
     <Compile Include="Watchers\ProcessActivityWatcher.cs" />
     <Compile Include="ViewModel\ActivityVM.cs" />
     <Compile Include="ViewModel\WatcherVM.cs" />
