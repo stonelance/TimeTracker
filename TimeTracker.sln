@@ -10,6 +10,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeTrackerCore", "Core\TimeTrackerCore.csproj", "{1987877E-17FB-43F2-AF49-F0C3EB9633C6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeTracker", "App\TimeTracker.csproj", "{A9C5D7CC-B98D-4A30-A07D-9EFE2062CCD1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C1827E73-4683-4155-93AD-1ABC2C55D751} = {C1827E73-4683-4155-93AD-1ABC2C55D751}
+		{E5ADFC1D-A52B-4F01-AC6B-A6191FE33116} = {E5ADFC1D-A52B-4F01-AC6B-A6191FE33116}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFocusWatcher", "Plugins\GameFocusWatcher\GameFocusWatcher.csproj", "{E5ADFC1D-A52B-4F01-AC6B-A6191FE33116}"
 EndProject
