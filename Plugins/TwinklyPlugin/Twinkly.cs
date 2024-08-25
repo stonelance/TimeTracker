@@ -40,18 +40,53 @@ namespace TwinklyPlugin
 
         private async Task<JObject> PostData(string data, string url)
         {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new System.Uri(this.urlPath + url);
-            if (!string.IsNullOrEmpty(this.authToken))
+            using (HttpClient client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Add("x-auth-token", this.authToken);
-            }
-            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                client.BaseAddress = new System.Uri(this.urlPath + url);
+                if (!string.IsNullOrEmpty(this.authToken))
+                {
+                    client.DefaultRequestHeaders.Add("x-auth-token", this.authToken);
+                }
+                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-            HttpContent content = new StringContent(data, UTF8Encoding.UTF8, "application/json");
-            try
+                HttpContent content = new StringContent(data, UTF8Encoding.UTF8, "application/json");
+                try
+                {
+                    HttpResponseMessage messge = await client.PostAsync(url, content).ConfigureAwait(false);
+                    string description = string.Empty;
+                    if (messge.IsSuccessStatusCode)
+                    {
+                        string result = messge.Content.ReadAsStringAsync().Result;
+                        description = result;
+                    }
+                    else if (messge.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        await Login().ConfigureAwait(false);
+                        return await PostData(data, url).ConfigureAwait(false);
+                    }
+
+                    return JObject.Parse(description);
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+        }
+
+        private async Task<JObject> PostRaw(byte[] data, string url)
+        {
+            using (HttpClient client = new HttpClient())
             {
-                HttpResponseMessage messge = await client.PostAsync(url, content);
+                client.BaseAddress = new System.Uri(this.urlPath + url);
+                if (!string.IsNullOrEmpty(this.authToken))
+                {
+                    client.DefaultRequestHeaders.Add("x-auth-token", this.authToken);
+                }
+                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                HttpContent content = new ByteArrayContent(data);
+                HttpResponseMessage messge = await client.PostAsync(url, content).ConfigureAwait(false);
                 string description = string.Empty;
                 if (messge.IsSuccessStatusCode)
                 {
@@ -60,68 +95,39 @@ namespace TwinklyPlugin
                 }
                 else if (messge.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
-                    await Login();
-                    return await PostData(data, url);
+                    await Login().ConfigureAwait(false);
+                    return await PostRaw(data, url).ConfigureAwait(false);
                 }
 
                 return JObject.Parse(description);
             }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private async Task<JObject> PostRaw(byte[] data, string url)
-        {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new System.Uri(this.urlPath + url);
-            if (!string.IsNullOrEmpty(this.authToken))
-            {
-                client.DefaultRequestHeaders.Add("x-auth-token", this.authToken);
-            }
-            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-
-            HttpContent content = new ByteArrayContent(data);
-            HttpResponseMessage messge = await client.PostAsync(url, content);
-            string description = string.Empty;
-            if (messge.IsSuccessStatusCode)
-            {
-                string result = messge.Content.ReadAsStringAsync().Result;
-                description = result;
-            }
-            else if (messge.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                await Login();
-                return await PostRaw(data, url);
-            }
-
-            return JObject.Parse(description);
         }
 
         private async Task<JObject> DoGet(string url)
         {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new System.Uri(this.urlPath + url);
-            if (!string.IsNullOrEmpty(this.authToken))
+            using (HttpClient client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Add("x-auth-token", this.authToken);
-            }
-            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                client.BaseAddress = new System.Uri(this.urlPath + url);
+                if (!string.IsNullOrEmpty(this.authToken))
+                {
+                    client.DefaultRequestHeaders.Add("x-auth-token", this.authToken);
+                }
+                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-            HttpResponseMessage messge = await client.GetAsync(url);
-            if (messge.IsSuccessStatusCode)
-            {
-                string result = messge.Content.ReadAsStringAsync().Result;
-                return JObject.Parse(result);
-            }
-            else if (messge.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                await Login();
-                return await DoGet(url);
-            }
+                HttpResponseMessage messge = await client.GetAsync(url).ConfigureAwait(false);
+                if (messge.IsSuccessStatusCode)
+                {
+                    string result = messge.Content.ReadAsStringAsync().Result;
+                    return JObject.Parse(result);
+                }
+                else if (messge.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await Login().ConfigureAwait(false);
+                    return await DoGet(url).ConfigureAwait(false);
+                }
 
-            return new JObject();
+                return new JObject();
+            }
         }
 
         public async Task Login()
@@ -158,33 +164,36 @@ namespace TwinklyPlugin
         {
             if (effectId != null)
             {
-                await PostData($"{{\"mode\": \"{mode.ToString().ToLowerInvariant()}\", \"effect_id\": \"{effectId}\"}}", "/xled/v1/led/mode");
+                await PostData($"{{\"mode\": \"{mode.ToString().ToLowerInvariant()}\", \"effect_id\": \"{effectId}\"}}", "/xled/v1/led/mode").ConfigureAwait(false);
             }
             else
             {
-                await PostData($"{{\"mode\": \"{mode.ToString().ToLowerInvariant()}\"}}", "/xled/v1/led/mode");
+                await PostData($"{{\"mode\": \"{mode.ToString().ToLowerInvariant()}\"}}", "/xled/v1/led/mode").ConfigureAwait(false);
             }
         }
 
-        public ModeType GetMode()
+        public async Task<ModeType> GetMode()
         {
-            return (ModeType)Enum.Parse(typeof(ModeType), DoGet("/xled/v1/led/mode").ToString());
+            var response = await DoGet("/xled/v1/led/mode");
+            return (ModeType)Enum.Parse(typeof(ModeType), response.ToString());
         }
 
-        public string GetLedReset()
+        public async Task<string> GetLedReset()
         {
-            return DoGet("/xled/v1/led/reset").ToString();
+            var response = await DoGet("/xled/v1/led/reset");
+            return response.ToString();
         }
 
-        public string[] GetLedEffects()
+        public async Task<string[]> GetLedEffects()
         {
-            var v = DoGet("/xled/v1/led/effects").Result;
-            return v["unique_ids"].ToObject<string[]>();
+            var response = await DoGet("/xled/v1/led/effects");
+            return response["unique_ids"].ToObject<string[]>();
         }
 
-        public string GetLedColor()
+        public async Task<string> GetLedColor()
         {
-            return DoGet("/xled/v1/led/color").ToString();
+            var response = await DoGet("/xled/v1/led/color");
+            return response.ToString();
         }
 
         public async Task SetLedColor(byte r, byte g, byte b)
@@ -193,133 +202,143 @@ namespace TwinklyPlugin
             await PostData(data, "/xled/v1/led/color");
         }
 
-        public void UploadMovie(byte[] data)
+        public async Task UploadMovie(byte[] data)
         {
-            PostRaw(data, "/xled/v1/led/movie/full").Wait();
+            await PostRaw(data, "/xled/v1/led/movie/full");
         }
 
         // delay in milliseconds, led count (doesn't seem to do anything?), number of frames to use
-        public void SetMovieConfig(int delayInMs, int ledCount, int frameCount)
+        public async Task SetMovieConfig(int delayInMs, int ledCount, int frameCount)
         {
             string data = $"{{\"frame_delay\": {delayInMs},\"leds_number\": {ledCount},\"frames_number\": {frameCount}}}";
-            PostData(data, "/xled/v1/led/movie/config").Wait();
+            await PostData(data, "/xled/v1/led/movie/config");
         }
 
-        public string GetMovieConfig()
+        public async Task<string> GetMovieConfig()
         {
-            return DoGet("/xled/v1/led/movie/config").Result.ToString();
+            var response = await DoGet("/xled/v1/led/movie/config");
+            return response.ToString();
         }
 
-        public string GetFirewareVersion()
+        public async Task<string> GetFirewareVersion()
         {
-            return DoGet("/xled/v1/fw/version").Result.ToString();
+            var response = await DoGet("/xled/v1/fw/version");
+            return response.ToString();
         }
 
-        public string GetTimer()
+        public async Task<string> GetTimer()
         {
-            return DoGet("/xled/v1/timer").Result.ToString();
+            var response = await DoGet("/xled/v1/timer");
+            return response.ToString();
         }
 
-        public void SetTimer(int time_on, int time_now, int time_off)
+        public async Task SetTimer(int time_on, int time_now, int time_off)
         {
             string data = $"{{\"time_on\": {time_on},\"time_now\": {time_now},\"time_off\": {time_off}}}";
-            PostData(data, "/xled/v1/timer").Wait();
+            await PostData(data, "/xled/v1/timer");
         }
 
-        public string DeviceName
+        public async Task<string> GetDeviceName()
         {
-            get
-            {
-                return DoGet("/xled/v1/device_name").Result.ToString();
-            }
-            set
-            {
-                PostData($"{{\"name\", \"{value}\"}}", "/xled/v1/device_name").Wait();
-            }
+            var response = await DoGet("/xled/v1/device_name");
+            return response.ToString();
         }
 
-        public string GetNetworkScan()
+        public async Task SetDeviceName(string name)
         {
-            return DoGet("/xled/v1/network/scan").Result.ToString();
+            await PostData($"{{\"name\", \"{name}\"}}", "/xled/v1/device_name");
         }
 
-        public string GetNetworkScanResults()
+        public async Task<string> GetNetworkScan()
         {
-            return DoGet("/xled/v1/network/scan_results").Result.ToString();
+            var response = await DoGet("/xled/v1/network/scan");
+            return response.ToString();
         }
 
-
-        public void SetRTFrame(byte[] data)
+        public async Task<string> GetNetworkScanResults()
         {
-            PostRaw(data, "/xled/v1/led/rt/frame").Wait();
+            var response = await DoGet("/xled/v1/network/scan_results");
+            return response.ToString();
         }
 
-        public void UdpRtFrame(byte[] data, int numLeds)
+
+        public async Task SetRTFrame(byte[] data)
+        {
+            await PostRaw(data, "/xled/v1/led/rt/frame");
+        }
+
+        public async Task UdpRtFrame(byte[] data, int numLeds)
         {
             /*
             header = [0] * 10;
-
             frame[0] = 0x00;
-
             frame = "".join(map(chr, frame));
             */
         }
 
-        public string GetDriverParams()
+        public async Task<string> GetDriverParams()
         {
-            return DoGet("/xled/v1/led/driver_params2").ToString();
+            var response = await DoGet("/xled/v1/led/driver_params2");
+            return response.ToString();
         }
 
-        public void SetDriverParams(int timing_adjust_1 = 10, int timing_adjust_2 = 62)
+        public async Task SetDriverParams(int timing_adjust_1 = 10, int timing_adjust_2 = 62)
         {
             string data = $"{{\"timing_adjust_2\": {timing_adjust_2}, \"timing_adjust_1\": {timing_adjust_1}}}";
-            PostData(data, "/xled/v1/led/driver_params2").Wait();
+            await PostData(data, "/xled/v1/led/driver_params2");
         }
 
-        public string GetMqtt()
+        public async Task<string> GetMqtt()
         {
-            return DoGet("/xled/v1/mqtt/config").ToString();
+            var response = await DoGet("/xled/v1/mqtt/config");
+            return response.ToString();
         }
 
-        public void SetLedConfig(int first_led_id = 0, int length = 200)
+        public async Task SetLedConfig(int first_led_id = 0, int length = 200)
         {
             string data = $"{{\"strings\": [{{ \"first_led_id\": {first_led_id}, \"length\": {length}}}]}}";
-            PostData(data, "/xled/v1/led/config").Wait();
+            await PostData(data, "/xled/v1/led/config");
         }
 
-        public string GetLedConfig()
+        public async Task<string> GetLedConfig()
         {
-            return DoGet("/xled/v1/led/config").ToString();
+            var response = await DoGet("/xled/v1/led/config");
+            return response.ToString();
         }
 
-        public string GetNetworkStatus()
+        public async Task<string> GetNetworkStatus()
         {
-            return DoGet("/xled/v1/network/status").ToString();
+            var response = await DoGet("/xled/v1/network/status");
+            return response.ToString();
         }
 
-        public void SetEcho(string message)
+        public async Task SetEcho(string message)
         {
-            PostData(message, "/xled/v1/echo").Wait();
+            await PostData(message, "/xled/v1/echo");
         }
 
-        public string GetProductionInfo()
+        public async Task<string> GetProductionInfo()
         {
-            return DoGet("/xled/v1/production_info").ToString();
+            var response = await DoGet("/xled/v1/production_info");
+            return response.ToString();
         }
 
-        public string GetStatus()
+        public async Task<string> GetStatus()
         {
-            return DoGet("/xled/v1/status").ToString();
+            var response = await DoGet("/xled/v1/status");
+            return response.ToString();
         }
 
-        public string GetReset2()
+        public async Task<string> GetReset2()
         {
-            return DoGet("/xled/v1/led/reset2").ToString();
+            var response = await DoGet("/xled/v1/led/reset2");
+            return response.ToString();
         }
 
-        public string GetOffsets()
+        public async Task<string> GetOffsets()
         {
-            return DoGet("/xled/v1/fw/offsets").ToString();
+            var response = await DoGet("/xled/v1/fw/offsets");
+            return response.ToString();
         }
     }
 }

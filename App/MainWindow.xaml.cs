@@ -197,9 +197,10 @@ namespace TimeTracker
                         }
                         catch (TaskCanceledException)
                         {
+                            break;
                         }
                     }
-                }, this.cancellationTokenSource.Token);
+                });
 
             this.saveTask = Task.Run(async () =>
                 {
@@ -216,9 +217,10 @@ namespace TimeTracker
                         }
                         catch (TaskCanceledException)
                         {
+                            break;
                         }
                     }
-                }, this.cancellationTokenSource.Token);
+                });
         }
 
 		private string GetAppDataPath()
@@ -436,13 +438,13 @@ namespace TimeTracker
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            this.cancellationTokenSource.Cancel();
+            this.updateTask.Wait();
+            this.saveTask.Wait();
+            this.ActivityTracker.Cancel();
+
             lock (this)
             {
-                this.cancellationTokenSource.Cancel();
-                this.updateTask.Wait();
-                this.saveTask.Wait();
-                this.ActivityTracker.Cancel();
-
                 Save(this.TodaysActivity);
             }
         }
