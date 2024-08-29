@@ -10,7 +10,9 @@ using System.Threading.Tasks;
 
 namespace TwinklyPlugin
 {
-    // This logic is based on python script, but i don't remember where it was from.
+    // This logic is based on python script, but i don't remember where it was from (possibly https://labs.withsecure.com/publications/twinkly-twinkly-little-star?)
+    // See also https://xled.readthedocs.io/en/latest/ for a similar python implementation.
+    // TwinklyWPF is another option which has a Twinkly_xled C# version of the API but I found many parts of it incomplete that I need, and i had unfortunately already written this
     internal class Twinkly
     {
         public enum ModeType
@@ -26,10 +28,11 @@ namespace TwinklyPlugin
         };
 
         private string authToken;
+        private DateTime authExpiration;
         private string ip;
         private string urlPath;
 
-        public bool IsLoggedIn { get { return !String.IsNullOrEmpty(this.authToken); } }
+        public bool IsLoggedIn { get { return !String.IsNullOrEmpty(this.authToken) && this.authExpiration > DateTime.Now; } }
 
         public Twinkly(string ip)
         {
@@ -140,6 +143,7 @@ namespace TwinklyPlugin
             {
                 this.authToken = jResp["authentication_token"].Value<string>();
                 var chall = jResp["challenge-response"];
+                this.authExpiration = DateTime.Now + TimeSpan.FromSeconds((int)jResp["authentication_token_expires_in"]);
                 data = $"{{\"challenge-response\": \"{chall}\"}}";
 
                 await PostData(data, "/xled/v1/verify");
@@ -155,9 +159,44 @@ namespace TwinklyPlugin
             await PostData("", "/xled/v1/logout");
         }
 
-        public async Task<JObject> GetDeviceInfo()
+        public class DeviceInfo
         {
-            return await DoGet("/xled/v1/gestalt");
+            public string product_name;
+            public int product_version;
+            public string hardware_version;
+            public int bytes_per_led;
+            public int flash_size;
+            public string hw_id;
+            public int led_type;
+            public int led_version;
+            public int rssi;
+            public string product_code;
+            public string fw_family;
+            public string device_name;
+            public string uptime;
+            public string mac;
+            public string uuid;
+            public int base_leds_number;
+            public int max_supported_led;
+            public int number_of_led;
+            public class Power
+            {
+                public int mA;
+                public int mV;
+            }
+            public Power pwr;
+            public string led_profile;
+            public float frame_rate;
+            public float measured_frame_rate;
+            public int movie_capacity;
+            public int max_movies;
+            public int wire_type;
+            public string copyright;
+        }
+        public async Task<DeviceInfo> GetDeviceInfo()
+        {
+            var response = await DoGet("/xled/v1/gestalt");
+            return response.ToObject<DeviceInfo>();
         }
 
         public async Task SetMode(ModeType mode, string effectId = null)
@@ -241,7 +280,7 @@ namespace TwinklyPlugin
         public async Task<string> GetDeviceName()
         {
             var response = await DoGet("/xled/v1/device_name");
-            return response.ToString();
+            return response.Value<string>("name");
         }
 
         public async Task SetDeviceName(string name)
@@ -276,10 +315,19 @@ namespace TwinklyPlugin
             */
         }
 
-        public async Task<string> GetDriverParams()
+        public class DriverParams
+        {
+            public int t0h;
+            public int t0l;
+            public int t1h;
+            public int t1l;
+            public int tendh;
+            public int tendl;
+        }
+        public async Task<DriverParams> GetDriverParams()
         {
             var response = await DoGet("/xled/v1/led/driver_params2");
-            return response.ToString();
+            return response.ToObject< DriverParams>();
         }
 
         public async Task SetDriverParams(int timing_adjust_1 = 10, int timing_adjust_2 = 62)
@@ -288,10 +336,19 @@ namespace TwinklyPlugin
             await PostData(data, "/xled/v1/led/driver_params2");
         }
 
-        public async Task<string> GetMqtt()
+        public class Mqtt
+        {
+            public bool enabled;
+            public string broker_host;
+            public int broker_port;
+            public string client_id;
+            public string user;
+            public string keep_alive_interval;
+        }
+        public async Task<Mqtt> GetMqtt()
         {
             var response = await DoGet("/xled/v1/mqtt/config");
-            return response.ToString();
+            return response.ToObject< Mqtt>();
         }
 
         public async Task SetLedConfig(int first_led_id = 0, int length = 200)

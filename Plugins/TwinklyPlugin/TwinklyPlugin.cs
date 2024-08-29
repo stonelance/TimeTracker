@@ -1,11 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+using System.Drawing;
 using System.Threading.Tasks;
-using System.Windows.Media;
 using TimeTracker;
 
 namespace TwinklyPlugin
@@ -20,6 +16,7 @@ namespace TwinklyPlugin
         private Twinkly twinkly;
         private int ledCount;
         private ActivityId? activeActivityId;
+        private DateTime lastLoginAttempt;
 
         public class PluginSettings
         {
@@ -36,17 +33,21 @@ namespace TwinklyPlugin
         {
             this.activityManager = activityManager;
             this.settings = settings.ToObject<PluginSettings>();
+
             this.twinkly = new Twinkly(this.settings.DeviceIP);
 
             // Try to connect to the twinkly in the background
+            this.lastLoginAttempt = DateTime.Now;
             this.twinkly.Login().ContinueWith(async (_) =>
                 {
                     if (this.twinkly.IsLoggedIn)
                     {
                         var deviceInfo = await this.twinkly.GetDeviceInfo();
-                        this.ledCount = ((int)deviceInfo["number_of_led"]);
+                        this.ledCount = deviceInfo.number_of_led;
 
                         //var effectIds = this.twinkly.GetLedEffects();
+
+                        var v = await this.twinkly.GetDriverParams();
 
                         await UpdateTwinklyState();
                     }
@@ -55,6 +56,13 @@ namespace TwinklyPlugin
 
         private async Task UpdateTwinklyState()
         {
+            if (!this.twinkly.IsLoggedIn &&
+                (DateTime.Now - this.lastLoginAttempt) > TimeSpan.FromMinutes(5))
+            {
+                this.lastLoginAttempt = DateTime.Now;
+                await this.twinkly.Login();
+            }
+
             if (this.twinkly.IsLoggedIn && this.activeActivityId.HasValue)
             {
                 var activitySettings = this.activityManager.GetPluginSettingsFromActivity(this.Name, this.activeActivityId.Value)?.ToObject<ActivitySettings>();

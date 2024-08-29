@@ -1,21 +1,20 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35201.131
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{D1B1DB4E-EEB0-47F4-A751-B6F69B1A3ABC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwinklyPlugin", "Plugins\TwinklyPlugin\TwinklyPlugin.csproj", "{C1827E73-4683-4155-93AD-1ABC2C55D751}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwinklyPlugin", "Plugins\TwinklyPlugin\TwinklyPlugin.csproj", "{C1827E73-4683-4155-93AD-1ABC2C55D751}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeTrackerCore", "Core\TimeTrackerCore.csproj", "{1987877E-17FB-43F2-AF49-F0C3EB9633C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeTrackerCore", "Core\TimeTrackerCore.csproj", "{1987877E-17FB-43F2-AF49-F0C3EB9633C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeTracker", "App\TimeTracker.csproj", "{A9C5D7CC-B98D-4A30-A07D-9EFE2062CCD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeTracker", "App\TimeTracker.csproj", "{A9C5D7CC-B98D-4A30-A07D-9EFE2062CCD1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C1827E73-4683-4155-93AD-1ABC2C55D751} = {C1827E73-4683-4155-93AD-1ABC2C55D751}
 		{E5ADFC1D-A52B-4F01-AC6B-A6191FE33116} = {E5ADFC1D-A52B-4F01-AC6B-A6191FE33116}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFocusWatcher", "Plugins\GameFocusWatcher\GameFocusWatcher.csproj", "{E5ADFC1D-A52B-4F01-AC6B-A6191FE33116}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameFocusWatcher", "Plugins\GameFocusWatcher\GameFocusWatcher.csproj", "{E5ADFC1D-A52B-4F01-AC6B-A6191FE33116}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

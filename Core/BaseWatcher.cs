@@ -21,7 +21,7 @@ namespace TimeTracker.Watchers
             }
         }
 
-        public BaseWatcher(string displayName, ActivityId activity)
+        public BaseWatcher(string displayName, ActivityId activity, JObject settings)
         {
             this.DisplayName = displayName;
             this.Activity = activity;

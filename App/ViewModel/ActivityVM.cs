@@ -25,7 +25,8 @@ namespace TimeTracker.ViewModel
         {
             get
             {
-                return new Rectangle() { Fill = new SolidColorBrush(ActivityManager.Instance.GetColorFromActivity(this.Activity)) };
+                var color = ActivityManager.Instance.GetColorFromActivity(this.Activity);
+                return new Rectangle() { Fill = new SolidColorBrush(System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B)) };
             }
         }
 

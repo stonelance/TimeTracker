@@ -337,7 +337,7 @@ namespace TimeTracker
                 // TODO: if we detect multiple failures in a row, message the user?
                 if (!(e.InnerException is IOException))
                 {
-                    throw e;
+                    throw;
                 }
             }
             catch (IOException)

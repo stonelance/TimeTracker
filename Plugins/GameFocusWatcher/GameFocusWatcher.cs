@@ -39,8 +39,8 @@ namespace GameFocusWatcher
             }
         }
 
-        public GameFocusWatcher(string displayName, ActivityId activity, IDictionary<string, JToken> settings)
-            : base(displayName, activity)
+        public GameFocusWatcher(string displayName, ActivityId activity, JObject settings)
+            : base(displayName, activity, settings)
         {
         }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -39,8 +40,19 @@ namespace TimeTracker.Watchers
             }
         }
 
+        public ProcessActivityWatcher(string displayName, ActivityId activity, JObject settings)
+            : base(displayName, activity, settings)
+        {
+            this.processName = settings.Value<string>("ProcessName");
+            this.cpuUsageThresholdForRunning = settings.Value<double>("CPUUsageThresholdForRunning");
+            this.delayBeforeReturnToInactiveInSeconds = settings.Value<double>("DelayBeforeReturnToInactiveInSeconds");
+            this.updatePeriodInMilliseconds = (int)(1000 * settings.Value<double>("UpdatePeriodInSeconds"));
+
+            this.watchTask = Task.Run(async () => { await Watch(this.cancellationTokenSource.Token); }, this.cancellationTokenSource.Token);
+        }
+
         public ProcessActivityWatcher(string displayName, ActivityId activity, string processName, double cpuUsageThresholdForRunning, double delayBeforeReturnToInactiveInSeconds, double updatePeriodInSeconds)
-            : base(displayName, activity)
+            : base(displayName, activity, null)
         {
             this.processName = processName;
             this.cpuUsageThresholdForRunning = cpuUsageThresholdForRunning;

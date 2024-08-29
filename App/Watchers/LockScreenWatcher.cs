@@ -1,4 +1,6 @@
 ﻿using Microsoft.Win32;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace TimeTracker.Watchers
 {
@@ -20,8 +22,8 @@ namespace TimeTracker.Watchers
             }
         }
 
-        public LockScreenWatcher(string displayName, ActivityId activity)
-            : base(displayName, activity)
+        public LockScreenWatcher(string displayName, ActivityId activity, JObject settings)
+            : base(displayName, activity, settings)
         {
             Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
         }

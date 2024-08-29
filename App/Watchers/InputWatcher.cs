@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,16 +31,17 @@ namespace TimeTracker.Watchers
         {
             get
             {
-                return this.CurrentState == State.Active;
+                // Intentionally backwards, because the UI uses this to determine whether to mark active the associated activity (for idling)
+                return this.CurrentState != State.Active;
             }
         }
 
-        public InputWatcher(string displayName, ActivityId activity, float timeToIdleInSeconds, int updatePeriodInMilliseconds)
-            : base(displayName, activity)
+        public InputWatcher(string displayName, ActivityId activity, JObject settings)
+            : base(displayName, activity, settings)
         {
             this.normalActivity = activity;
-            this.timeToIdleInSeconds = timeToIdleInSeconds;
-            this.updatePeriodInMilliseconds = updatePeriodInMilliseconds;
+            this.timeToIdleInSeconds = settings.Value<float>("TimeToIdleInSeconds");
+            this.updatePeriodInMilliseconds = (int)(1000 * settings.Value<double>("UpdatePeriodInSeconds"));
 
             this.watchTask = Task.Run(async () => { await Watch(this.cancellationTokenSource.Token); }, this.cancellationTokenSource.Token);
         }
@@ -85,6 +88,8 @@ namespace TimeTracker.Watchers
                 {
                 }
             }
+
+            // TODO: add logic for game controller input?
         }
     }
 }

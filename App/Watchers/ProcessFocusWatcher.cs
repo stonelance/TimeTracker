@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,8 +27,14 @@ namespace TimeTracker.Watchers
             }
         }
 
+        public ProcessFocusWatcher(string displayName, ActivityId activity, JObject settings)
+            : base(displayName, activity, settings)
+        {
+            this.processName = settings.Value<string>("ProcessName");
+        }
+
         public ProcessFocusWatcher(string displayName, ActivityId activity, string processName)
-            : base(displayName, activity)
+            : base(displayName, activity, null)
         {
             this.processName = processName;
         }

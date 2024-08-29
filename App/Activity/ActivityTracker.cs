@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using TimeTracker.Properties;
 using TimeTracker.ViewModel;
 using TimeTracker.Watchers;
 using static TimeTracker.Configuration;
@@ -27,56 +28,17 @@ namespace TimeTracker
         {
             this.dailyActivity = dailyActivity;
 
-            this.winEventDelegate = new WinEventDelegate(WinEventProc);
-            this.winEventHook = NativeMethods.SetWinEventHook(NativeMethods.EVENT_SYSTEM_FOREGROUND, NativeMethods.EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, this.winEventDelegate, 0, 0, NativeMethods.WINEVENT_OUTOFCONTEXT);
+            // This doesn't seem to handle alt-tab well (or at all).  Switching to a polling method instead
+            //this.winEventDelegate = new WinEventDelegate(WinEventProc);
+            //this.winEventHook = NativeMethods.SetWinEventHook(NativeMethods.EVENT_SYSTEM_FOREGROUND, NativeMethods.EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, this.winEventDelegate, 0, 0, NativeMethods.WINEVENT_OUTOFCONTEXT);
 
             this.Watchers = new Dictionary<BaseWatcher, WatcherVM>();
 
-            var lockScreenWatcher = new LockScreenWatcher("Lock Screen", ActivityId.Away);
-            lockScreenWatcher.PropertyChanged += (object obj, PropertyChangedEventArgs args) => { this.Watchers[(BaseWatcher)obj].Active = ((BaseWatcher)obj).IsActive; };
-            this.Watchers.Add(lockScreenWatcher, new WatcherVM(lockScreenWatcher));
-
-            var inputWatcher = new InputWatcher("Idle", ActivityManager.Instance.GetActivityFromName("Idle"), 60, 1000);
-            inputWatcher.PropertyChanged += (object obj, PropertyChangedEventArgs args) => { this.Watchers[(BaseWatcher)obj].Active = !((BaseWatcher)obj).IsActive; };
-            this.Watchers.Add(inputWatcher, new WatcherVM(inputWatcher));
-
-            foreach (var watcherConfig in configuration.ProcessFocusWatchers)
-            {
-                var watcher = new ProcessFocusWatcher(watcherConfig.DisplayName, ActivityManager.Instance.GetActivityFromName(watcherConfig.ActivityName), watcherConfig.ProcessName);
-                watcher.PropertyChanged += (object obj, PropertyChangedEventArgs args) => { this.Watchers[(BaseWatcher)obj].Active = ((BaseWatcher)obj).IsActive; };
-                this.Watchers.Add(watcher, new WatcherVM(watcher));
-            }
-
-            foreach (var watcherConfig in configuration.ProcessActivityWatchers)
-            {
-                var watcher = new ProcessActivityWatcher(watcherConfig.DisplayName, ActivityManager.Instance.GetActivityFromName(watcherConfig.ActivityName), watcherConfig.ProcessName, watcherConfig.CPUUsageThresholdForRunning, watcherConfig.DelayBeforeReturnToInactiveInSeconds, watcherConfig.UpdatePeriodInSeconds);
-                watcher.PropertyChanged += (object obj, PropertyChangedEventArgs args) => { this.Watchers[(BaseWatcher)obj].Active = ((BaseWatcher)obj).IsActive; };
-                this.Watchers.Add(watcher, new WatcherVM(watcher));
-            }
-
-            Dictionary<string, Assembly> watcherPlugins = new Dictionary<string, Assembly>();
-            foreach (var watcherConfig in configuration.PluginWatchers)
-            {
-                if (!watcherPlugins.ContainsKey(watcherConfig.Path))
-                {
-                    watcherPlugins.Add(watcherConfig.Path, LoadAssembly(watcherConfig.Path));
-                }
-
-                var pluginAssembly = watcherPlugins[watcherConfig.Path];
-                if (pluginAssembly == null)
-                {
-                    throw new ApplicationException($"Watcher Plugin '{watcherConfig.Path}' was not found, or could not be loaded.");
-                }
-
-                var watcher = CreateWatcherFromAssembly(pluginAssembly, watcherConfig.DisplayName, ActivityManager.Instance.GetActivityFromName(watcherConfig.ActivityName), watcherConfig.Settings);
-                watcher.PropertyChanged += (object obj, PropertyChangedEventArgs args) => { this.Watchers[(BaseWatcher)obj].Active = ((BaseWatcher)obj).IsActive; };
-                this.Watchers.Add(watcher, new WatcherVM(watcher));
-            }
-
-            foreach (var watcher in this.Watchers)
-            {
-                watcher.Value.PropertyChanged += watcher_PropertyChanged;
-            }
+            Dictionary<string, Type> watcherTypes = new Dictionary<string, Type>();
+            watcherTypes.Add("LockScreenWatcher", typeof(LockScreenWatcher));
+            watcherTypes.Add("InputWatcher", typeof(InputWatcher));
+            watcherTypes.Add("ProcessFocusWatcher", typeof(ProcessFocusWatcher));
+            watcherTypes.Add("ProcessActivityWatcher", typeof(ProcessActivityWatcher));
 
             this.Plugins = new List<ITrackerPlugin>();
             foreach (var pluginConfig in configuration.Plugins)
@@ -84,11 +46,47 @@ namespace TimeTracker
                 Assembly pluginAssembly = LoadAssembly(pluginConfig.Path);
                 if (pluginAssembly == null)
                 {
-                    throw new Exception($"Plugin '{pluginConfig.Path}' doesn't exist and can't be loaded");
+                    throw new Exception($"Plugin '{pluginConfig.Path}' was not found, or could not be loaded.");
                 }
-                var plugin = CreatePluginFromAssembly(pluginAssembly);
-                plugin.Initialize(configuration, ActivityManager.Instance, pluginConfig.Settings != null ? JObject.FromObject(pluginConfig.Settings) : null);
-                this.Plugins.Add(plugin);
+
+                var trackerPluginType = GetTrackerPluginTypeFromAssembly(pluginAssembly);
+                var watcherPluginType = GetWatcherTypeFromAssembly(pluginAssembly);
+
+                if (trackerPluginType == null && watcherPluginType == null)
+                {
+                    string availableTypes = string.Join(",", pluginAssembly.GetTypes().Select(t => t.FullName));
+                    throw new ApplicationException(
+                        $"Can't find any type which implements ITrackerPlugin or BaseWatcher in {pluginAssembly} from {pluginAssembly.Location}.\n" +
+                        $"Available types: {availableTypes}");
+                }
+                else if (trackerPluginType != null && watcherPluginType != null)
+                {
+                    throw new ApplicationException(
+                        $"Assembly {pluginAssembly} from {pluginAssembly.Location} contains both an IWatcherPlugin '{trackerPluginType.FullName}' and BaseWatcher '{watcherPluginType.FullName}' when only one or the other was expected.\n");
+                }
+                else if (trackerPluginType != null)
+                {
+                    ITrackerPlugin plugin = Activator.CreateInstance(trackerPluginType) as ITrackerPlugin;
+                    plugin.Initialize(configuration, ActivityManager.Instance, pluginConfig.Settings != null ? JObject.FromObject(pluginConfig.Settings) : null);
+                    this.Plugins.Add(plugin);
+                }
+                else
+                {
+                    watcherTypes.Add(watcherPluginType.Name, watcherPluginType);
+                }
+            }
+
+            foreach (var watcherConfig in configuration.Watchers)
+            {
+                var type = watcherTypes[watcherConfig.Type];
+                var watcher = Activator.CreateInstance(type, watcherConfig.DisplayName, ActivityManager.Instance.GetActivityFromName(watcherConfig.ActivityName), watcherConfig.Settings != null ? JObject.FromObject(watcherConfig.Settings) : null) as BaseWatcher;
+                watcher.PropertyChanged += (object obj, PropertyChangedEventArgs args) => { this.Watchers[(BaseWatcher)obj].Active = ((BaseWatcher)obj).IsActive; };
+                this.Watchers.Add(watcher, new WatcherVM(watcher));
+            }
+
+            foreach (var watcher in this.Watchers)
+            {
+                watcher.Value.PropertyChanged += watcher_PropertyChanged;
             }
 
             // Force update the current activity
@@ -111,7 +109,7 @@ namespace TimeTracker
             return Assembly.LoadFile(path);
         }
 
-        private ITrackerPlugin CreatePluginFromAssembly(Assembly assembly)
+        private Type GetTrackerPluginTypeFromAssembly(Assembly assembly)
         {
             int count = assembly.GetTypes().Count(x => typeof(ITrackerPlugin).IsAssignableFrom(x));
             if (count > 1)
@@ -123,21 +121,14 @@ namespace TimeTracker
             {
                 if (typeof(ITrackerPlugin).IsAssignableFrom(type))
                 {
-                    ITrackerPlugin result = Activator.CreateInstance(type) as ITrackerPlugin;
-                    if (result != null)
-                    {
-                        return result;
-                    }
+                    return type;
                 }
             }
 
-            string availableTypes = string.Join(",", assembly.GetTypes().Select(t => t.FullName));
-            throw new ApplicationException(
-                $"Can't find any type which implements ITrackerPlugin in {assembly} from {assembly.Location}.\n" +
-                $"Available types: {availableTypes}");
+            return null;
         }
 
-        private BaseWatcher CreateWatcherFromAssembly(Assembly assembly, string displayName, ActivityId activity, IDictionary<string, JToken> settings)
+        private Type GetWatcherTypeFromAssembly(Assembly assembly)
         {
             int count = assembly.GetTypes().Count(x => typeof(BaseWatcher).IsAssignableFrom(x));
             if (count > 1)
@@ -149,18 +140,11 @@ namespace TimeTracker
             {
                 if (typeof(BaseWatcher).IsAssignableFrom(type))
                 {
-                    BaseWatcher result = Activator.CreateInstance(type, displayName, activity, settings) as BaseWatcher;
-                    if (result != null)
-                    {
-                        return result;
-                    }
+                    return type;
                 }
             }
 
-            string availableTypes = string.Join(",", assembly.GetTypes().Select(t => t.FullName));
-            throw new ApplicationException(
-                $"Can't find any type which implements BaseWatcher in {assembly} from {assembly.Location}.\n" +
-                $"Available types: {availableTypes}");
+            return null;
         }
 
         public void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
@@ -220,6 +204,25 @@ namespace TimeTracker
         {
             lock (this)
             {
+                try
+                {
+                    nint hwnd = NativeMethods.GetForegroundWindow();
+                    uint processId;
+                    NativeMethods.GetWindowThreadProcessId(hwnd, out processId);
+
+                    var foregroundProcess = Process.GetProcessById((int)processId);
+                    if (foregroundProcess != null)
+                    {
+                        foreach (var watcher in this.Watchers)
+                        {
+                            watcher.Key.OnForegroundProcessNameChanged(foregroundProcess.ProcessName);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                }
+
                 Application.Current.Dispatcher.InvokeAsync(() =>
                     {
                         this.dailyActivity.Update(now);

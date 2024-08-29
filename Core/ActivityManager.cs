@@ -1,9 +1,8 @@
-﻿
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
-using System.Windows.Media;
 
 namespace TimeTracker
 {
@@ -70,17 +69,17 @@ namespace TimeTracker
 
             if (!activityIdToActivityConfig.ContainsKey(ActivityId.NoData))
             {
-                activityIdToActivityConfig.Add(ActivityId.NoData, new Configuration.ActivityConfig() { Name = "NoData", Color = Colors.LightGray });
+                activityIdToActivityConfig.Add(ActivityId.NoData, new Configuration.ActivityConfig() { Name = "NoData", Color = Color.LightGray });
             }
 
             if (!activityIdToActivityConfig.ContainsKey(ActivityId.Unknown))
             {
-                activityIdToActivityConfig.Add(ActivityId.Unknown, new Configuration.ActivityConfig() { Name = "Unknown", Color = Colors.Red });
+                activityIdToActivityConfig.Add(ActivityId.Unknown, new Configuration.ActivityConfig() { Name = "Unknown", Color = Color.Red });
             }
 
             if (!activityIdToActivityConfig.ContainsKey(ActivityId.Away))
             {
-                activityIdToActivityConfig.Add(ActivityId.Away, new Configuration.ActivityConfig() { Name = "Away", Color = Colors.LightSkyBlue });
+                activityIdToActivityConfig.Add(ActivityId.Away, new Configuration.ActivityConfig() { Name = "Away", Color = Color.LightSkyBlue });
             }
 
             // Generate other mappings
