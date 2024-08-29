@@ -17,8 +17,8 @@ namespace TimeTracker
     public class ActivityTracker
     {
         private DailyActivity dailyActivity;
-        private WinEventDelegate winEventDelegate;
-        private IntPtr winEventHook;
+        //private WinEventDelegate winEventDelegate;
+        //private IntPtr winEventHook;
 
         public Dictionary<BaseWatcher, WatcherVM> Watchers { get; private set; }
         public List<ITrackerPlugin> Plugins { get; private set; }

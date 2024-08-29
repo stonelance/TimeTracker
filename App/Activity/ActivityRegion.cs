@@ -35,11 +35,12 @@ namespace TimeTracker
             set { this.ActivityId = ActivityManager.Instance.GetActivityFromName(value); }
         }
 
-        public Color Color
+        public System.Windows.Media.Color Color
         {
             get
             {
-                return ActivityManager.Instance.GetColorFromActivity(this.ActivityId);
+                var color = ActivityManager.Instance.GetColorFromActivity(this.ActivityId);
+                return System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
             }
         }
 

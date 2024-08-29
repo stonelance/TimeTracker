@@ -20,7 +20,7 @@ namespace TwinklyPlugin
 
         public class PluginSettings
         {
-            public string DeviceIP;
+            public string DeviceIPOrHostName;
         }
 
         public class ActivitySettings
@@ -34,7 +34,7 @@ namespace TwinklyPlugin
             this.activityManager = activityManager;
             this.settings = settings.ToObject<PluginSettings>();
 
-            this.twinkly = new Twinkly(this.settings.DeviceIP);
+            this.twinkly = new Twinkly(this.settings.DeviceIPOrHostName);
 
             // Try to connect to the twinkly in the background
             this.lastLoginAttempt = DateTime.Now;

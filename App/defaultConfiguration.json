@@ -2,7 +2,10 @@
   "Plugins": [
     {
       "Path": "TwinklyPlugin.dll",
-      "DeviceIP": "192.168.1.218"
+      "DeviceIPOrHostName": "Twinkly-D9C649"
+    },
+    {
+      "Path": "GameFocusWatcher.dll"
     }
   ],
   "Activities": [
@@ -137,60 +140,86 @@
       ]
     }
   ],
-  "ProcessFocusWatchers": [
+  "Watchers": [
     {
+      "Type": "LockScreenWatcher",
+      "DisplayName": "Lock Screen",
+      "Activityname": "Idle"
+    },
+    {
+      "Type": "InputWatcher",
+      "DisplayName": "Idle",
+      "Activityname": "Idle",
+      "TimeToIdleInSeconds": 60,
+      "UpdatePeriodInSeconds": 1
+    },
+    {
+      "Type": "GameFocusWatcher",
+      "DisplayName": "Game",
+      "ActivityName": "Gaming"
+    },
+    {
+      "Type": "ProcessFocusWatcher",
       "DisplayName": "Outlook",
       "ActivityName": "Email",
       "ProcessName": "outlook"
     },
     {
+      "Type": "ProcessFocusWatcher",
       "DisplayName": "Microsoft Teams",
       "ActivityName": "Chat",
       "ProcessName": "teams"
     },
     {
+      "Type": "ProcessFocusWatcher",
       "DisplayName": "Slack",
       "ActivityName": "Chat",
       "ProcessName": "slack"
     },
     {
+      "Type": "ProcessFocusWatcher",
       "DisplayName": "Discord",
       "ActivityName": "Social Chat",
       "ProcessName": "discord"
     },
     {
+      "Type": "ProcessFocusWatcher",
       "DisplayName": "Zoom",
       "ActivityName": "Meeting",
       "ProcessName": "zoom"
     },
     {
+      "Type": "ProcessFocusWatcher",
       "DisplayName": "Remote Desktop",
       "ActivityName": "RemoteDesktop",
       "ProcessName": "mstsc"
     },
     {
+      "Type": "ProcessFocusWatcher",
       "DisplayName": "Remote Desktop",
       "ActivityName": "RemoteDesktop",
       "ProcessName": "msrdc"
     },
     {
-      "DisplayName": "Internet Explorer",
-      "ActivityName": "Internet",
-      "ProcessName": "iexplore"
-    },
-    {
+      "Type": "ProcessFocusWatcher",
       "DisplayName": "Chrome",
       "ActivityName": "Internet",
       "ProcessName": "chrome"
     },
     {
+      "Type": "ProcessFocusWatcher",
+      "DisplayName": "Edge",
+      "ActivityName": "Internet",
+      "ProcessName": "msedge"
+    },
+    {
+      "Type": "ProcessFocusWatcher",
       "DisplayName": "Visual Studio",
       "ActivityName": "Programming",
       "ProcessName": "devenv"
-    }
-  ],
-  "ProcessActivityWatchers": [
+    },
     {
+      "Type": "ProcessActivityWatcher",
       "DisplayName": "Compiler",
       "ActivityName": "Compiling",
       "ProcessName": "cl",
@@ -199,6 +228,7 @@
       "UpdatePeriodInSeconds": 0.5
     },
     {
+      "Type": "ProcessActivityWatcher",
       "DisplayName": "C# Compiler",
       "ActivityName": "Compiling",
       "ProcessName": "vbcscompiler",
@@ -207,19 +237,13 @@
       "UpdatePeriodInSeconds": 0.5
     },
     {
+      "Type": "ProcessActivityWatcher",
       "DisplayName": "Linker",
       "ActivityName": "Linking",
       "ProcessName": "link",
       "CPUUsageThresholdForRunning": 0.02,
       "DelayBeforeReturnToInactiveInSeconds": 0.0,
       "UpdatePeriodInSeconds": 0.5
-    }
-  ],
-  "PluginWatchers": [
-    {
-      "Path": "GameFocusWatcher.dll",
-      "DisplayName": "Game",
-      "ActivityName": "Gaming"
     }
   ]
 }
