@@ -21,10 +21,10 @@ of all time spent in each activity in terms of absolute time and relative time (
 # Plugin Types
 A given dll can only implement one of these various types of plugin.
 
-## Tracker Plugin
+### Tracker Plugin
 This plugin allows implementing a class derrived from TimeTracker.ITrackerPlugin to monitor and respond to changes in the current activity.
 
-## Watcher Plugin
+### Watcher Plugin
 This plugin allows implementing a custom watcher by implementing a class that derrives from TimeTracker.BaseWatcher.
 
 # Configuration format
