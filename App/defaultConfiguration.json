@@ -144,7 +144,7 @@
     {
       "Type": "LockScreenWatcher",
       "DisplayName": "Lock Screen",
-      "Activityname": "Idle"
+      "Activityname": "Away"
     },
     {
       "Type": "InputWatcher",

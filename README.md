@@ -170,7 +170,7 @@ For the InputWatcher, this specifies for how long there must be no user input to
         {
           "Type": "LockScreenWatcher",
           "DisplayName": "Lock Screen",
-          "Activityname": "Idle"
+          "Activityname": "Away"
         },
         {
           "Type": "InputWatcher",
