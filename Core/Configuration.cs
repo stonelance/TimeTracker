@@ -27,6 +27,7 @@ namespace TimeTracker
 
             public string Name;
             public Color Color;
+            public bool IsIncludedInRelativeTime = true;
             public List<PluginConfig> PluginSettings;
         }
 

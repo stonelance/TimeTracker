@@ -42,8 +42,7 @@ namespace TimeTracker.ViewModel
         {
             get
             {
-                if (this.Activity == ActivityId.NoData ||
-                    this.Activity == ActivityId.Away)
+                if (!ActivityManager.Instance.IsIncludedInRelativeTime(this.Activity))
                 {
                     return "N/A";
                 }
@@ -51,8 +50,7 @@ namespace TimeTracker.ViewModel
                 TimeSpan totalTime = new TimeSpan();
                 foreach (var entry in this.dailyActivity.ActivitySummaries)
                 {
-                    if (entry.Key != ActivityId.NoData &&
-                        entry.Key != ActivityId.Away)
+                    if (ActivityManager.Instance.IsIncludedInRelativeTime(entry.Key))
                     {
                         totalTime += entry.Value;
                     }

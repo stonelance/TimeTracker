@@ -14,7 +14,7 @@ The default configuration is in defautlConfiguration.json.  On first run of Time
 The default configuration should already contain many common activities and applications, and serve as an example should you need to modify any configuration.  While the app is running, you can leave it in the background and it will track what
 activities are happening on your machine.  The top of the window contains a timeline view of what activities have been tracked at any given time.  You can choose to show or collapse Away time in the timeline, and you can scroll and zoom the timeline
 view with the mouse.  You can also change what date range is being displayed in the app.  The default is to only show the current day.  Below the timeline on the left shows the current activity tracked by the app.  On the bottom right shows a summary
-of all time spent in each activity in terms of absolute time and relative time (excluding away\idle).
+of all time spent in each activity in terms of absolute time and relative time (excluding any activities with IsIncludedInRelativeTime set to false).
 
 ![Acreenshot of TimeTracker](/Screenshot.jpg)
 
@@ -42,7 +42,21 @@ This is a Watcher plugin uses Windows MRU game list to determine if a running pr
 
 ## Activities
 This section allows specifying all the activities the app will track.  Some activities such as NoData, Idle and Away are built in and will automatically be added if not included in the list.  This section allow choosing the color used by the activity in
-the UI.  Tracker plugins can also have custom settings per activity specified under PluginSettings.  For example, the Twinkly plugin specifies the LEDColor for each activity.
+the UI.  Tracker plugins can also have custom settings per activity specified under PluginSettings.
+
+### Properties
+
+#### Name
+The name of the activity displayed in the UI
+
+#### Color
+The color of the activity displayed in the UI
+
+#### IsIncludedInRelativeTime
+ Whether or not this activity is included in the relative time column of the table in the bottom right (defaults to true)
+
+#### PluginSettings
+An optional array of plugin settings for the activity, each containing the PluginName followed by any properties used by that plugin (eg. LedColor for TwinklyPlugin)
 
 ## Watchers
 This section defines all watchers used by the app.  The watchers determine when a given activity is occuring or not.  Multiple watchers can be mapped to the same activity (for instance, both chrome nad edge could be classified as "Browsing").  Watchers
@@ -106,6 +120,11 @@ For the InputWatcher, this specifies for how long there must be no user input to
       ],
       "Activities": [
         {
+          "Name": "NoData",
+          "Color": "#FFD3D3D3",
+          "IsIncludedInRelativeTime": false
+        },
+        {
           "Name": "Unknown",
           "Color": "#FFFF0000",
           "PluginSettings": [
@@ -128,6 +147,7 @@ For the InputWatcher, this specifies for how long there must be no user input to
         {
           "Name": "Idle",
           "Color": "#FFFFC0CB",
+          "IsIncludedInRelativeTime": false,
           "PluginSettings": [
             {
               "PluginName": "TwinklyPlugin",
@@ -138,6 +158,7 @@ For the InputWatcher, this specifies for how long there must be no user input to
         {
           "Name": "Away",
           "Color": "#FF87CEFA",
+          "IsIncludedInRelativeTime": false,
           "PluginSettings": [
             {
               "PluginName": "TwinklyPlugin",
@@ -168,16 +189,16 @@ For the InputWatcher, this specifies for how long there must be no user input to
       ],
       "Watchers": [
         {
-          "Type": "LockScreenWatcher",
-          "DisplayName": "Lock Screen",
-          "Activityname": "Away"
-        },
-        {
           "Type": "InputWatcher",
           "DisplayName": "Idle",
           "Activityname": "Idle",
           "TimeToIdleInSeconds": 60,
           "UpdatePeriodInSeconds": 1
+        },
+        {
+          "Type": "LockScreenWatcher",
+          "DisplayName": "Lock Screen",
+          "Activityname": "Away"
         },
         {
           "Type": "GameFocusWatcher",

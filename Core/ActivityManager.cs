@@ -69,7 +69,7 @@ namespace TimeTracker
 
             if (!activityIdToActivityConfig.ContainsKey(ActivityId.NoData))
             {
-                activityIdToActivityConfig.Add(ActivityId.NoData, new Configuration.ActivityConfig() { Name = "NoData", Color = Color.LightGray });
+                activityIdToActivityConfig.Add(ActivityId.NoData, new Configuration.ActivityConfig() { Name = "NoData", Color = Color.LightGray, IsIncludedInRelativeTime = false });
             }
 
             if (!activityIdToActivityConfig.ContainsKey(ActivityId.Unknown))
@@ -79,7 +79,7 @@ namespace TimeTracker
 
             if (!activityIdToActivityConfig.ContainsKey(ActivityId.Away))
             {
-                activityIdToActivityConfig.Add(ActivityId.Away, new Configuration.ActivityConfig() { Name = "Away", Color = Color.LightSkyBlue });
+                activityIdToActivityConfig.Add(ActivityId.Away, new Configuration.ActivityConfig() { Name = "Away", Color = Color.LightSkyBlue, IsIncludedInRelativeTime = false });
             }
 
             // Generate other mappings
@@ -101,6 +101,11 @@ namespace TimeTracker
         public Color GetColorFromActivity(ActivityId activityId)
         {
             return activityIdToActivityConfig[activityId].Color;
+        }
+
+        public bool IsIncludedInRelativeTime(ActivityId activityId)
+        {
+            return activityIdToActivityConfig[activityId].IsIncludedInRelativeTime;
         }
 
         public JObject GetPluginSettingsFromActivity(string pluginName, ActivityId activityId)

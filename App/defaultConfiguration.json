@@ -10,6 +10,11 @@
   ],
   "Activities": [
     {
+      "Name": "NoData",
+      "Color": "#FFD3D3D3",
+      "IsIncludedInRelativeTime": false
+    },
+    {
       "Name": "Unknown",
       "Color": "#FFFF0000",
       "PluginSettings": [
@@ -92,6 +97,7 @@
     {
       "Name": "Idle",
       "Color": "#FFFFC0CB",
+      "IsIncludedInRelativeTime": false,
       "PluginSettings": [
         {
           "PluginName": "TwinklyPlugin",
@@ -102,6 +108,7 @@
     {
       "Name": "Away",
       "Color": "#FF87CEFA",
+      "IsIncludedInRelativeTime": false,
       "PluginSettings": [
         {
           "PluginName": "TwinklyPlugin",
@@ -150,7 +157,7 @@
       "Type": "InputWatcher",
       "DisplayName": "Idle",
       "Activityname": "Idle",
-      "TimeToIdleInSeconds": 60,
+      "TimeToIdleInSeconds": 300,
       "UpdatePeriodInSeconds": 1
     },
     {
