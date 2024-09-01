@@ -46,16 +46,16 @@ the UI.  Tracker plugins can also have custom settings per activity specified un
 
 ### Properties
 
-#### Name
+#### - Name
 The name of the activity displayed in the UI
 
-#### Color
+#### - Color
 The color of the activity displayed in the UI
 
-#### IsIncludedInRelativeTime
+#### - IsIncludedInRelativeTime
  Whether or not this activity is included in the relative time column of the table in the bottom right (defaults to true)
 
-#### PluginSettings
+#### - PluginSettings
 An optional array of plugin settings for the activity, each containing the PluginName followed by any properties used by that plugin (eg. LedColor for TwinklyPlugin)
 
 ## Watchers
